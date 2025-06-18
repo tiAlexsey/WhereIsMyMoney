@@ -1,0 +1,40 @@
+﻿services:
+  webapi:
+    image: webapi
+    build:
+      context: .
+      dockerfile: WebApi/Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - ConnectionStrings__DefaultConnection=${DefaultConnection}
+      - AuthJwt__Key=${Auth_Jwt}
+      - AuthJwt__Issuer=${Auth_Issuer}
+      - AuthJwt__Audience=${Auth_Audience}
+      - AuthJwt__ExpiresInHour=${AuthJwt__ExpiresInHour}
+    networks:
+      - backend
+    ports:
+      - "5000:8080"
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:
+
+networks:
+  backend:
+    driver: bridge
